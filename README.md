@@ -1,4 +1,4 @@
-# mda-mini
+# ModelDiscoveryAgent
 
 Minimal reimplementation of the **Model Discovery Agent**
 ([arXiv 2608.09696](https://arxiv.org/abs/2608.09696), Murphy 2026) for
@@ -51,8 +51,8 @@ retrofitted honestly.
 ```bash
 uv venv --python 3.12 .venv
 uv pip install --python .venv/bin/python -e ".[dev,notebooks]"
-.venv/bin/python -m ipykernel install --user --name mda-mini \
-    --display-name "Python (mda-mini)"   # register kernel for any Jupyter/VS Code
+.venv/bin/python -m ipykernel install --user --name modeldiscoveryagent \
+    --display-name "Python (ModelDiscoveryAgent)"   # register kernel for any Jupyter/VS Code
 .venv/bin/pytest            # expect: smoke tests pass, 4 checks skipped
 .venv/bin/jupyter lab notebooks/mda_walkthrough.ipynb   # the guided tour
 ```

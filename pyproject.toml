@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mda-mini"
+name = "modeldiscoveryagent"
 version = "0.0.1"
 description = "Minimal reimplementation of the Model Discovery Agent (arXiv 2608.09696) for replication and probing"
 requires-python = ">=3.10"
@@ -16,8 +16,11 @@ dependencies = [
 [project.optional-dependencies]
 # Stage B "inference" and "hypotheses" agents opt into these:
 full = ["jax>=0.4", "diffrax>=0.5", "blackjax>=1.0"]
-# Stage B "worlds" agent opts into this:
-bench = ["neuronbench"]
+# Stage B "worlds" agent opts into this. NeuronBench is not the similarly
+# named `neurobench` package on PyPI, so pin its Git source for reproducibility.
+bench = [
+    "neuronbench @ git+https://github.com/murphyk/neuronbench.git@c354622458c460b419cab821d482c879f0578377",
+]
 # ipykernel pinned <7: VS Code's Jupyter extension cannot connect to
 # ipykernel 7.x kernels (microsoft/vscode-jupyter#17400).
 notebooks = ["jupyterlab", "matplotlib", "ipykernel<7"]
