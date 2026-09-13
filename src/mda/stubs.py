@@ -72,7 +72,7 @@ class LineWorld:
 
     def test_designs(self) -> Sequence[Design]:
         # Held-out interventions OUTSIDE the training grid on purpose:
-        # interventional evaluation should include extrapolation (probe P6).
+        # interventional evaluation should include extrapolation.
         return [Design.from_dict({"x": v}, name=f"x={v:g}") for v in (-4.0, 5.0)]
 
 
@@ -81,8 +81,12 @@ class LineWorld:
 # ---------------------------------------------------------------------------
 
 @dataclass
-class PolynomialHypothesis:
-    """y(x) = sum_k theta_k * x^k, theta_k ~ N(0, prior_scale^2) iid."""
+class PolynomialHypothesis(Hypothesis):
+    """Implements Hypothesis for y(x) = sum_k theta_k * x^k.
+
+    The coefficients have independent N(0, prior_scale^2) priors.
+    Explicit inheritance makes the implemented interface visible here.
+    """
 
     degree: int
     prior_scale: float = 3.0
@@ -120,6 +124,14 @@ class PolynomialHypothesis:
         x = sympy.Symbol("x")
         cs = sympy.symbols(f"c0:{self.n_params}")
         return sum(c * x**k for k, c in enumerate(cs))
+
+    def human_description(self) -> str:
+        return (
+            f"A degree-{self.degree} polynomial in x: y = {self.sympy_form()}. "
+            "The coefficients have independent Gaussian priors centered on zero "
+            f"with standard deviation {self.prior_scale:g}. "
+            "Predictions exclude observation noise."
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -165,7 +177,7 @@ class PriorISEngine:
         loglik = np.zeros(self.n_samples)
         for obs in data:
             loglik += np.array(
-                [noise.log_lik(obs.y, hypothesis.simulate(obs.design, th)) for th in thetas]
+                [noise.log_likelihood(obs.y, hypothesis.simulate(obs.design, th)) for th in thetas]
             )
         log_total = logsumexp(loglik)
         return ISPosterior(

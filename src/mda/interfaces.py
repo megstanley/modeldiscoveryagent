@@ -104,11 +104,10 @@ class NoiseModel(Protocol):
 
     Kept separate from Hypothesis so the same structure can be scored under
     different observation models (deterministic Gaussian now; Poisson spike
-    counts or learned-summary-statistic likelihoods later, per the paper's
-    NeuronBench setup).
+    counts or learned-summary-statistic likelihoods later, like NeuronBench setup).
     """
 
-    def log_lik(self, y_obs: Array, y_pred: Array) -> float:
+    def log_likelihood(self, y_obs: Array, y_pred: Array) -> float:
         """Log p(y_obs | y_pred)."""
         ...
 
@@ -120,15 +119,11 @@ class NoiseModel(Protocol):
 @dataclass(frozen=True)
 class GaussianNoise:
     """Isotropic Gaussian observation noise — the base case.
-
-    This is the regime where the paper derives the analytic VoI expression
-    (max posterior-predictive variance), so it is the canonical NoiseModel
-    for Phase 0/1 worlds.
     """
 
     sigma: float
 
-    def log_lik(self, y_obs: Array, y_pred: Array) -> float:
+    def log_likelihood(self, y_obs: Array, y_pred: Array) -> float:
         r = np.asarray(y_obs, float) - np.asarray(y_pred, float)
         n = r.size
         return float(
@@ -160,8 +155,7 @@ class World(Protocol):
     noise: NoiseModel
 
     def description(self) -> str:
-        """Natural-language context handed to the Proposer (the paper's
-        'description of the domain'). Contamination probe P1 works by
+        """Natural-language context handed to the Proposer, the description of the domain. We can contaminate by
         rewriting exactly this string (obfuscated names/units)."""
         ...
 
@@ -174,7 +168,9 @@ class World(Protocol):
         ...
 
     def test_designs(self) -> Sequence[Design]:
-        """Held-out interventions for evaluation (eval harness only)."""
+        """Held-out interventions for evaluation. i.e. agent can't see these,
+        they are to produce clean observations at test time.
+        """
         ...
 
 
@@ -187,8 +183,13 @@ class Hypothesis(Protocol):
     """One candidate structure with free parameters theta.
 
     theta is always a flat float vector of length `n_params`; structure
-    lives in code/symbolic form, parameters in theta. That split is what
-    lets one InferenceEngine serve every proposed structure.
+    lives in code/symbolic form, parameters in theta.
+
+    This is meant to be a completely general way to represent any model of the world.
+
+    In practice, this might be nice to extend to the concept of "meta-hypothesis",
+    which is a language explanation with consequences for underlying model structures,
+    without specifying precise the model. But that's a TODO for me :)
     """
 
     name: str
@@ -213,13 +214,23 @@ class Hypothesis(Protocol):
         Must return the same shape as Observation.y for the target world.
         This is the expensive call — implementations should route counts
         through CostLedger via the caller.
+
+        The expense of course depends on the world being tested.
         """
         ...
 
     def sympy_form(self) -> Optional[Any]:
         """Symbolic form (sympy.Expr) if the model is a closed-form law,
         else None. Used by eval for symbolic-equivalence scoring
-        (ChemBench's sympy check); simulators (ODE worlds) return None.
+        (eg. ChemBench's sympy check); simulators (ODE worlds) return None.
+        """
+        ...
+
+    def human_description(self) -> Optional[str]:
+        """A human-readable description, or None when one is unavailable.
+
+        Implementations must provide this method even when sympy_form exists.
+        It can explain the model's variables and assumptions beyond its formula.
         """
         ...
 
