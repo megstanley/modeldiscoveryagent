@@ -5,3 +5,5 @@ __pycache__/
 results/
 .DS_Store
 .vscode/
+/LEARNING_PLAN.md
+/COMPARATIVE_IMPLEMENTATION_PLAN.md

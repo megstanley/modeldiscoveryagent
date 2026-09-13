@@ -14,6 +14,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+neural = ["torch>=2.2,<3"]
 # Stage B "inference" and "hypotheses" agents opt into these:
 full = ["jax>=0.4", "diffrax>=0.5", "blackjax>=1.0"]
 # Stage B "worlds" agent opts into this:
