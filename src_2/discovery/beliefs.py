@@ -158,7 +158,7 @@ class Updater(Protocol):
 def predictive_moments(state: Beliefs, inputs: Array) -> dict[str, Array]:
     """Copmuting model posterior moments to allow for model selection. 
     
-    Only works if the model pool has been computed in a fully Bayesian fashion.
+    Only works if the model pool has been computed in a fully Bayesian fashion
     """
     if (state.support_kind != "bayesian_model_probability"
             or state.parameters is None or state.model_probabilities is None):
