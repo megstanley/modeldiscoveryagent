@@ -2,7 +2,8 @@
 from dataclasses import dataclass
 from typing import Protocol, Sequence, runtime_checkable
 import numpy as np
-from ..records import Array, RNG, Design, Observation
+from ..records import Array, RNG, Observation
+from ..design.designs import Design
 from ..noise import NoiseModel, GaussianNoise
 
 
