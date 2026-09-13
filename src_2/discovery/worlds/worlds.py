@@ -2,8 +2,8 @@
 from dataclasses import dataclass
 from typing import Protocol, Sequence, runtime_checkable
 import numpy as np
-from .records import Array, RNG, Design, Observation
-from .noise import NoiseModel, GaussianNoise
+from ..records import Array, RNG, Design, Observation
+from ..noise import NoiseModel, GaussianNoise
 
 
 @runtime_checkable
@@ -68,4 +68,3 @@ class LineWorld(World):
         # Held-out interventions OUTSIDE the training grid on purpose:
         # interventional evaluation should include extrapolation.
         return [Design.from_dict({"x": v}, name=f"x={v:g}") for v in (-4.0, 5.0)]
-
